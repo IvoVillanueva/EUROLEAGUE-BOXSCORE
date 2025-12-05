@@ -40,6 +40,12 @@ boxscores_fn <- function(gamecode) {
   raw_teams <- httr::GET(url, query = list()) %>%
     content()
 
+   # Comprueba si el elemento principal "Stats" existe y tiene al menos 2 equipos (elementos)
+  if (!is.list(raw_teams) || is.null(raw_teams$Stats) || length(raw_teams$Stats) < 2) {
+    message(paste("Saltando gamecode:", gamecode, ". Juego no jugado o sin datos. Devolviendo NULL."))
+    return(NULL) 
+  }
+
   tm <- pluck(raw_teams, "Stats") %>%
     tibble(value = .) %>%
     unnest_wider(value) %>%
